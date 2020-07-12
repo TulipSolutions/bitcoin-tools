@@ -1,0 +1,26 @@
+load("@io_bazel_rules_kotlin//kotlin:kotlin.bzl", "kt_jvm_test")
+
+deps = [
+    "//src/main/kotlin/nl/tulipsolutions/byteutils",
+    "@maven//:junit_junit",
+    "@maven//:org_assertj_assertj_core",
+    "@maven//:org_bouncycastle_bcprov_jdk15on",
+]
+
+kt_jvm_test(
+    name = "test_base58",
+    size = "small",
+    srcs = glob(["Base58Test.kt"]),
+    tags = ["exclusive"],
+    test_class = "nl.tulipsolutions.byteutils.Base58Test",
+    deps = deps,
+)
+
+kt_jvm_test(
+    name = "test_bech32",
+    size = "small",
+    srcs = glob(["Bech32Test.kt"]),
+    tags = ["exclusive"],
+    test_class = "nl.tulipsolutions.byteutils.Bech32Test",
+    deps = deps,
+)

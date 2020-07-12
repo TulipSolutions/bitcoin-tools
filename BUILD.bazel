@@ -1,0 +1,18 @@
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "keyderivation",
+    actual = "//src/main/kotlin/nl/tulipsolutions/keyderivation",
+)
+
+alias(
+    name = "byteutils",
+    actual = "//src/main/kotlin/nl/tulipsolutions/byteutils",
+)
+
+alias(
+    name = "keyderivation-deps",
+    actual = "//src/main/kotlin/nl/tulipsolutions/keyderivation/deps",
+)
+
+)

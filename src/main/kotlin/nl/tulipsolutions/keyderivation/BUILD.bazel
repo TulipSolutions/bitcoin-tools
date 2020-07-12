@@ -1,0 +1,11 @@
+load("@io_bazel_rules_kotlin//kotlin:kotlin.bzl", "kt_jvm_library")
+
+kt_jvm_library(
+    name = "keyderivation",
+    srcs = glob(["*.kt"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//src/main/kotlin/nl/tulipsolutions/byteutils",
+        "//third_party/jvm/org/bouncycastle:bcprov_jdk15on",
+    ],
+)

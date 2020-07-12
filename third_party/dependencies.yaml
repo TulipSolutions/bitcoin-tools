@@ -1,0 +1,23 @@
+options:
+  thirdPartyDirectory: third_party/jvm
+  licenses:
+  - notice
+  buildFileName: BUILD.bazel
+  resolvers:
+  - id: "mavencentral"
+    type: "default"
+    url: https://repo.maven.apache.org/maven2/
+dependencies:
+  junit:
+    junit:
+      lang: java
+      version: '4.12'
+  org.assertj:
+    assertj-core:
+      lang: java
+      version: '3.11.1'
+  org.bouncycastle:
+    bcprov-jdk15on:
+      lang: java
+      version: "1.64"
+

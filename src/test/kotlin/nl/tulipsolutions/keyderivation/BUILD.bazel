@@ -1,0 +1,45 @@
+load("@io_bazel_rules_kotlin//kotlin:kotlin.bzl", "kt_jvm_test")
+
+deps = [
+    "//src/main/kotlin/nl/tulipsolutions/keyderivation",
+    "//src/main/kotlin/nl/tulipsolutions/byteutils",
+    "//third_party/jvm/junit",
+    "//third_party/jvm/org/assertj:assertj_core",
+    "//third_party/jvm/org/bouncycastle:bcprov_jdk15on",
+]
+
+kt_jvm_test(
+    name = "test_bip32_serde",
+    size = "small",
+    srcs = glob(["Bip32SerdeTest.kt"]),
+    tags = ["exclusive"],
+    test_class = "nl.tulipsolutions.keyderivation.Bip32SerdeTest",
+    deps = deps,
+)
+
+kt_jvm_test(
+    name = "test_bip84_serde",
+    size = "small",
+    srcs = glob(["Bip84SerdeTest.kt"]),
+    tags = ["exclusive"],
+    test_class = "nl.tulipsolutions.keyderivation.Bip84SerdeTest",
+    deps = deps,
+)
+
+kt_jvm_test(
+    name = "test_bip173",
+    size = "small",
+    srcs = glob(["Bip173Test.kt"]),
+    tags = ["exclusive"],
+    test_class = "nl.tulipsolutions.keyderivation.Bip173Test",
+    deps = deps,
+)
+
+kt_jvm_test(
+    name = "test_extended_key_wrapper",
+    size = "small",
+    srcs = glob(["ExtendedKeyWrapperTest.kt"]),
+    tags = ["exclusive"],
+    test_class = "nl.tulipsolutions.keyderivation.ExtendedKeyWrapperTest",
+    deps = deps,
+)

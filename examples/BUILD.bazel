@@ -1,0 +1,7 @@
+package(default_visibility = ["//visibility:public"])
+
+# In this directory run: bazel run example-bin zprvAdG4iTXWBoARxkkzNpNh8r6Qag3irQB8PzEMkAFeTRXxHpbF9z4QgEvBRmfvqWvGp42t42nvgGpNgYSJA9iefm1yYNZKEm7z6qUWCroSQnE H84 H0
+alias(
+    name = "example-bin",
+    actual = "//src/main/kotlin/com/example/simpleproject:example-bin",
+)

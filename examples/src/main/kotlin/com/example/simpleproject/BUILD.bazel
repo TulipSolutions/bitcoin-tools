@@ -1,0 +1,18 @@
+load("@io_bazel_rules_kotlin//kotlin:kotlin.bzl", "kt_jvm_library","kt_jvm_binary")
+
+kt_jvm_library(
+    name = "example",
+    srcs = glob(["*.kt"]),
+    visibility = ["//examples:__subpackages__"],
+    deps = [
+        "@nl_tulipsolutions_bitcoin_tools//src/main/kotlin/nl/tulipsolutions/keyderivation",
+    ],
+)
+
+kt_jvm_binary(
+    name = "example-bin",
+    srcs = glob(["*.kt"]),
+    main_class = "com.example.simpleproject.MainKt",
+    visibility = ["//visibility:public"],
+    deps = [":example"],
+)

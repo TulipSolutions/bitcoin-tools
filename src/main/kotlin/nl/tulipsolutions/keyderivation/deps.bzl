@@ -1,3 +1,3 @@
 KEYDERIVATION_ARTIFACTS = [
-    "org.bouncycastle:bcprov-jdk15on:1.64"
+    "org.bouncycastle:bcprov-jdk15on:1.64",
 ]

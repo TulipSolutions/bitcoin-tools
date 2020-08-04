@@ -11,8 +11,13 @@ alias(
 )
 
 alias(
-    name = "keyderivation-deps",
-    actual = "//src/main/kotlin/nl/tulipsolutions/keyderivation/deps",
+    name = "mnemonic",
+    actual = "//src/main/kotlin/nl/tulipsolutions/mnemonic",
+)
+
+alias(
+    name = "keyderivation-deps.bzl",
+    actual = "//src/main/kotlin/nl/tulipsolutions/keyderivation/deps.bzl",
 )
 
 ### Formatter

@@ -41,6 +41,12 @@ maven_install(
             "4.12",
             testonly = True,
         ),
+        maven.artifact(
+            "org.jetbrains.kotlinx",
+            "kotlinx-serialization-runtime",
+            "0.20.0",
+            testonly = True,
+        ),
         "org.bouncycastle:bcprov-jdk15on:1.64",
     ],
     maven_install_json = "//:maven_install.json",
@@ -111,3 +117,18 @@ gazelle_dependencies()
 load("@nl_tulipsolutions_bazel_tools//rules_addlicense:deps.bzl", "addlicense_dependencies")
 
 addlicense_dependencies()
+
+# Files for test vectors
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+
+http_file(
+    name = "english_mnemonic_json",
+    sha256 = "a1f7e56bc84fdec891391654ebc5e6c6cdcd70881b21a28eca4b212ad00713ad",
+    urls = ["https://raw.githubusercontent.com/trezor/python-mnemonic/ad06157e21fc2c2145c726efbfdcf69df1350061/vectors.json"],
+)
+
+http_file(
+    name = "japanese_mnemonic_json",
+    sha256 = "780d6a5f21827e5b455fdad35703e2c60ed9dfd47c625daaf50c01600dc4c9e2",
+    urls = ["https://raw.githubusercontent.com/bip32JP/bip32JP.github.io/360c05a6439e5c461bbe5e84c7567ec38eb4ac5f/test_JP_BIP39.json"],
+)

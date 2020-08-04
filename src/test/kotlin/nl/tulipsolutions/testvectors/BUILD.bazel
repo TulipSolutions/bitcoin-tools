@@ -1,0 +1,27 @@
+load("@io_bazel_rules_kotlin//kotlin:kotlin.bzl", "kt_compiler_plugin", "kt_jvm_import", "kt_jvm_test")
+
+kt_compiler_plugin(
+    name = "serialization_plugin",
+    deps = [
+        "@com_github_jetbrains_kotlin//:kotlinx-serialization-compiler-plugin",
+    ],
+)
+
+kt_jvm_test(
+    name = "testvectors",
+    srcs = glob(["*.kt"]),
+    data = [
+        "@english_mnemonic_json//file",
+        "@japanese_mnemonic_json//file",
+    ],
+    plugins = [
+        ":serialization_plugin",
+    ],
+    test_class = "nl.tulipsolutions.testvectors.MnemonicVectorsTest",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_jetbrains_kotlin//:kotlin-reflect",
+        "@maven//:junit_junit",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_serialization_runtime",
+    ],
+)

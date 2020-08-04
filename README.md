@@ -10,6 +10,7 @@ Addresses without having to import large third-party dependencies.
 ## Currently implemented
 
 * [Bip32](src/main/kotlin/nl/tulipsolutions/keyderivation/Bip32Serde.kt) HD key derivation
+* [Bip39](src/main/kotlin/nl/tulipsolutions/mnemonic/Bip39.kt) Entropy to Mnemonic and Mnemonic to seed conversion
 * [Bip44](src/main/kotlin/nl/tulipsolutions/keyderivation/Bip44Serde.kt) Purpose value derivation
 * [Bip84](src/main/kotlin/nl/tulipsolutions/keyderivation/Bip84Serde.kt) Segwit key derivation and address generation
 * [BIP173](src/main/kotlin/nl/tulipsolutions/keyderivation/BIP173.kt) Decode/encoding Base32/Bech32
@@ -95,6 +96,16 @@ val childOfChild = child.deriveChild(HARDENED_KEY_ZERO + 0)
 println(childOfChild.getAddress())
 println(childOfChild.serializeExtKey())
 println(childOfChild.getPublicKey())
+
+// ExtendedKey From seed
+val mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
+val passphrase = ""
+val extendedKeyFromMnemonic = ExtendedKeyWrapper(
+    seed = vector.mnemonic.split(" ").toSeed(passphrase),
+    serde = Bip32Serde(),
+    isMainNet = true
+)
+println(extendedKeyFromMnemonic.serializeExtKey().decodeBase58())
 ```
 
 See also [example Main.kt](examples/src/main/kotlin/com/example/simpleproject/Main.kt)

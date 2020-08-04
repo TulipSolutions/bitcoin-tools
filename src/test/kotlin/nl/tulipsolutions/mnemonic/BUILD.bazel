@@ -1,0 +1,28 @@
+load("@io_bazel_rules_kotlin//kotlin:kotlin.bzl", "kt_jvm_import", "kt_jvm_test")
+
+deps = [
+    "//src/main/kotlin/nl/tulipsolutions/byteutils",
+    "//src/main/kotlin/nl/tulipsolutions/mnemonic",
+    "//src/main/kotlin/nl/tulipsolutions/mnemonic/wordlist",
+    "//src/test/kotlin/nl/tulipsolutions/testvectors",
+    "@maven//:junit_junit",
+    "@maven//:org_assertj_assertj_core",
+]
+
+kt_jvm_test(
+    name = "test_bip39",
+    size = "small",
+    srcs = glob(["Bip39Test.kt"]),
+    tags = ["exclusive"],
+    test_class = "nl.tulipsolutions.mnemonic.Bip39Test",
+    deps = deps,
+)
+
+kt_jvm_test(
+    name = "test_wordlists",
+    size = "small",
+    srcs = glob(["WordListsChecks.kt"]),
+    tags = ["exclusive"],
+    test_class = "nl.tulipsolutions.mnemonic.WordListsChecks",
+    deps = deps,
+)

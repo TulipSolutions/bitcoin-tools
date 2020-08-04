@@ -24,3 +24,12 @@ kt_jvm_test(
     test_class = "nl.tulipsolutions.byteutils.Bech32Test",
     deps = deps,
 )
+
+kt_jvm_test(
+    name = "test_byteutils",
+    size = "small",
+    srcs = glob(["HexTest.kt"]),
+    tags = ["exclusive"],
+    test_class = "nl.tulipsolutions.byteutils.HexTest",
+    deps = deps,
+)

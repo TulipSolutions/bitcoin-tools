@@ -15,4 +15,98 @@ alias(
     actual = "//src/main/kotlin/nl/tulipsolutions/keyderivation/deps",
 )
 
+### Formatter
+
+load("@io_bazel_rules_kotlin//kotlin:kotlin.bzl", "define_kt_toolchain")
+load("@com_github_bazelbuild_buildtools//buildifier:def.bzl", "buildifier")
+load("@nl_tulipsolutions_bazel_tools//rules_ktlint:def.bzl", "ktlint")
+load("@nl_tulipsolutions_bazel_tools//rules_intellij_formatter:def.bzl", "intellij_formatter")
+load("@nl_tulipsolutions_bazel_tools//rules_addlicense:def.bzl", "addlicense")
+load("@bazel_gazelle//:def.bzl", "gazelle")
+
+define_kt_toolchain(
+    name = "kotlin_toolchain",
+    api_version = "1.3",
+    jvm_target = "11",
+    language_version = "1.3",
+)
+
+exclude_patterns = [
+    ".*.git/*",
+    ".*.project/*",
+    ".*idea/*",
+    "./.ijwb/*",
+]
+
+# Formatting for BUILD, BUILD.bazel and WORKSPACE files
+buildifier(
+    name = "buildifier_check",
+    diff_command = "diff -u",
+    exclude_patterns = exclude_patterns,
+    mode = "diff",
+    verbose = True,
+)
+
+buildifier(
+    name = "buildifier_format",
+    exclude_patterns = exclude_patterns,
+    mode = "fix",
+)
+
+# Formatting for *.kt and *.kts files
+ktlint(
+    name = "ktlint_check",
+)
+
+ktlint(
+    name = "ktlint_format",
+    format = True,
+)
+
+intellij_formatter(
+    name = "intellij_format",
+    exclude_patterns = exclude_patterns,
+)
+
+intellij_formatter(
+    name = "intellij_check",
+    exclude_patterns = exclude_patterns,
+    mode = "check",
+)
+
+# Force Gazelle to create one rule per proto package using go_package option
+# Until https://github.com/bazelbuild/bazel-gazelle/issues/138 is resolved
+# gazelle:proto package
+# gazelle:proto_group go_package
+
+# gazelle:prefix gerrit/protocol
+# gazelle:resolve proto proto validate/validate.proto @com_envoyproxy_protoc_gen_validate//validate:validate_proto
+# gazelle:resolve proto go validate/validate.proto @com_envoyproxy_protoc_gen_validate//validate:go_default_library
+# gazelle:resolve go go google.golang.org/grpc @org_golang_google_grpc//:go_default_library
+# gazelle:ignore
+# gazelle:exclude third_party
+# gazelle:exclude node_modules
+# gazelle:exclude tecl/examples/node/node_modules
+
+gazelle(
+    name = "gazelle",
+    gazelle = "//bazel/gazelle",
+)
+
+addlicense_excludes = exclude_patterns + [
+]
+
+addlicense(
+    name = "addlicense_format",
+    copyright_holder = "Tulip Solutions B.V.",
+    exclude_patterns = addlicense_excludes,
+    license_type = "apache",
+)
+
+addlicense(
+    name = "addlicense_check",
+    copyright_holder = "Tulip Solutions B.V.",
+    exclude_patterns = addlicense_excludes,
+    license_type = "apache",
+    mode = "check",
 )

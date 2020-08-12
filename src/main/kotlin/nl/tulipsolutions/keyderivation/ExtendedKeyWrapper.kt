@@ -15,6 +15,8 @@
 package nl.tulipsolutions.keyderivation
 
 import java.lang.RuntimeException
+import javax.crypto.Mac
+import javax.crypto.spec.SecretKeySpec
 
 /*
    Glues the respective Bip serde with the resulting extended key
@@ -67,6 +69,43 @@ class ExtendedKeyWrapper {
             else -> throw RuntimeException("Type and net code: $netAndTypeCode, not supported")
         }
         extendedKey = serde.deSerializeExtKey(extKeyBytes)
+    }
+
+    /**
+     * Constructs an extended key from a seed
+     *
+     * @param seed the chaincode + keybytes
+     * @param serde the serializer-deserializer to use for derivation
+     * @param isMainNet whether it should generate mainnet keys (if false it generates testnet keys)
+     * @return [ExtendedKey]
+     */
+    constructor(
+        seed: ByteArray,
+        serde: ExtendedKeySerdeInterface,
+        isMainNet: Boolean = false
+    ) {
+        if (seed.size != 64) {
+            throw InvalidSeedSizeException(seed.size)
+        }
+        // hmac the seed as specified by: https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#master-key-generation
+        val mac = Mac.getInstance("HmacSHA512")
+        mac.reset()
+        val key = SecretKeySpec("Bitcoin seed".toByteArray(), "HmacSHA512")
+        mac.init(key)
+        val hmacSeed = mac.doFinal(seed)
+
+        this.serde = serde
+        this.extendedKey = ExtendedKey(
+            parentKey = null,
+            parentFingerprint = byteArrayOf(0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte()),
+            netAndTypeCode = serde.getNetCodeAndType(isMainNet, true),
+            depth = 0,
+            childNumber = byteArrayOf(0x00, 0x00, 0x00, 0x00),
+            // Pad the private key part
+            privateKey = byteArrayOf(0x00) + hmacSeed.sliceArray(0..31),
+            _publicKey = null,
+            chainCode = hmacSeed.sliceArray(32..63)
+        )
     }
 
     fun deriveChild(sequence: Int) = ExtendedKeyWrapper(

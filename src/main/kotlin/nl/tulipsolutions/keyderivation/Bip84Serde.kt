@@ -41,6 +41,17 @@ class Bip84Serde : Bip44Serde(
         val TESTNET_PRIVATE_CODE = TESTNET_CODE + byteArrayOf(0x18.toByte(), 0xbc.toByte())
     }
 
+    override fun getNetCodeAndType(isMainNet: Boolean, isPrivate: Boolean): ByteArray =
+        if (isMainNet) {
+            when (isPrivate) {
+                true -> MAINNET_PRIVATE_CODE
+                false -> MAINNET_PUBLIC_CODE
+            }
+        } else when (isPrivate) {
+            true -> TESTNET_PRIVATE_CODE
+            false -> TESTNET_PUBLIC_CODE
+        }
+
     override fun getAddress(extendedKey: ExtendedKey): String {
         if (extendedKey.depth.toInt() != 5) {
             throw InvalidDepthException(5, extendedKey.depth.toInt())

@@ -14,8 +14,12 @@
 
 package nl.tulipsolutions.keyderivation
 
+import nl.tulipsolutions.byteutils.Hex
+import nl.tulipsolutions.byteutils.decodeBase58
+import nl.tulipsolutions.mnemonic.toSeed
+import nl.tulipsolutions.testvectors.MnemonicTestVectorEntry
+import nl.tulipsolutions.testvectors.mnemonicTestVectors
 import org.assertj.core.api.Assertions
-import org.bouncycastle.util.encoders.Hex
 import org.junit.Test
 
 class ExtendedKeyWrapperTest {
@@ -29,6 +33,8 @@ class ExtendedKeyWrapperTest {
     private val testVec1M0HXPrivEncoded = "xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesn" +
         "DYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7"
 
+    private val BIP84rootMnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon " +
+        "abandon about"
     private val BIP84rootPub = "zpub6jftahH18ngZxLmXaKw3GSZzZsszmt9WqedkyZdezFtWRFBZqsQH5hyUmb4pCEeZGmVfQuP5bedXTB8is" +
         "6fTv19U1GQRyQUKQGUTzyHACMF"
     private val BIP84rootPriv = "zprvAWgYBBk7JR8Gjrh4UJQ2uJdG1r3WNRRfURiABBE3RvMXYSrRJL62XuezvGdPvG6GFBZduosCc1YP5wix" +
@@ -85,5 +91,30 @@ class ExtendedKeyWrapperTest {
         val buildBip84FromString = ExtendedKeyWrapper(m84slash0slash0xPriv)
         val derived = buildBip84FromString.deriveChild(0).deriveChild(0)
         Assertions.assertThat(derived.getAddress()).isEqualTo(m84AddressFirst)
+    }
+
+    @Test
+    fun testBip39MnemonicToXpriv() {
+        mnemonicTestVectors.values.flatten().forEach { vector: MnemonicTestVectorEntry ->
+            Assertions.assertThat(
+                ExtendedKeyWrapper(
+                    seed = vector.mnemonic.split(" ").toSeed(vector.passphrase),
+                    serde = Bip32Serde(),
+                    isMainNet = true
+                ).serializeExtKey().decodeBase58()
+
+            ).isEqualTo(vector.bip32_xprv.decodeBase58())
+        }
+    }
+
+    @Test
+    fun testBip84MnemonicToZpriv() {
+        Assertions.assertThat(
+            ExtendedKeyWrapper(
+                seed = BIP84rootMnemonic.split(" ").toSeed(""),
+                serde = Bip84Serde(),
+                isMainNet = true
+            ).serializeExtKey()
+        ).isEqualTo(BIP84rootPriv)
     }
 }

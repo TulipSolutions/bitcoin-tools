@@ -28,11 +28,6 @@ open class Bip32Serde(
     private val TESTNET_ADDRESS_CODE: ByteArray = byteArrayOf(0x6F)
 ) : ExtendedKeySerdeInterface {
 
-    // BIP32 does not have specific rules on how to derive children
-    override fun deriveChildBIPRules(extendedKey: ExtendedKey, sequence: Int) = extendedKey.deriveChild(sequence)
-
-    override fun toHexString(extendedKey: ExtendedKey) = extendedKey.toString()
-
     companion object {
         private val MAINNET_CODE = byteArrayOf(0x04.toByte(), 0x88.toByte())
         private val TESTNET_CODE = byteArrayOf(0x04.toByte(), 0x35.toByte())
@@ -49,6 +44,22 @@ open class Bip32Serde(
         @JvmStatic
         val TESTNET_PRIVATE_CODE = TESTNET_CODE + byteArrayOf(0x83.toByte(), 0x94.toByte())
     }
+
+    override fun getNetCodeAndType(isMainNet: Boolean, isPrivate: Boolean): ByteArray =
+        if (isMainNet) {
+            when (isPrivate) {
+                true -> MAINNET_PRIVATE_CODE
+                false -> MAINNET_PUBLIC_CODE
+            }
+        } else when (isPrivate) {
+            true -> TESTNET_PRIVATE_CODE
+            false -> TESTNET_PUBLIC_CODE
+        }
+
+    // BIP32 does not have specific rules on how to derive children
+    override fun deriveChildBIPRules(extendedKey: ExtendedKey, sequence: Int) = extendedKey.deriveChild(sequence)
+
+    override fun toHexString(extendedKey: ExtendedKey) = extendedKey.toString()
 
     override fun deSerializeExtKey(extKeyEncoded: String): ExtendedKey {
         return deSerializeExtKey(extKeyEncoded.decodeBase58())

@@ -6,6 +6,7 @@ kt_jvm_library(
     visibility = ["//examples:__subpackages__"],
     deps = [
         "@nl_tulipsolutions_bitcoin_tools//src/main/kotlin/nl/tulipsolutions/keyderivation",
+        "@nl_tulipsolutions_bitcoin_tools//src/main/kotlin/nl/tulipsolutions/mnemonic",
     ],
 )
 

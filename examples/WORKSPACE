@@ -11,7 +11,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
     name = "nl_tulipsolutions_bitcoin_tools",
-    commit = "411630849f4d43eaeac97f7dd7f49d865c92ee4e",
+    commit = "fbee0ac97f30c0b4ce72360f3b502ba97e149ca6",
     remote = "git@github.com:TulipSolutions/bitcoin-tools.git",
 )
 

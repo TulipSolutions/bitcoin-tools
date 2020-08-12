@@ -35,3 +35,7 @@ class HardenedDerivationRequiredException(currentDepth: Int, sequence: Int) : Ru
     override val message = "Hardened key derivation required on depth $currentDepth " +
         "sequence was ${Hex.toHexString(sequence.toByteArray())}"
 }
+
+class InvalidSeedSizeException(size: Int) : RuntimeException() {
+    override val message = "Seed should be 64bytes but was: $size"
+}

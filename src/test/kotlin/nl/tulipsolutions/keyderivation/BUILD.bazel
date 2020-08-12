@@ -40,5 +40,8 @@ kt_jvm_test(
     srcs = glob(["ExtendedKeyWrapperTest.kt"]),
     tags = ["exclusive"],
     test_class = "nl.tulipsolutions.keyderivation.ExtendedKeyWrapperTest",
-    deps = deps,
+    deps = deps + [
+        "//src/test/kotlin/nl/tulipsolutions/testvectors",
+        "//src/main/kotlin/nl/tulipsolutions/mnemonic",
+    ],
 )

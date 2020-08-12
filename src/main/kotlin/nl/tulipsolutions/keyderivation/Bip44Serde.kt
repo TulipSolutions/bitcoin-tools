@@ -18,7 +18,7 @@ import nl.tulipsolutions.byteutils.ZERO_BYTE
 
 // See: https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
 open class Bip44Serde(
-    private val purpose: Int = 44,
+    val purpose: Int = 44,
     private val MAINNET_PUBLIC_CODE: ByteArray = this.MAINNET_PUBLIC_CODE,
     private val MAINNET_PRIVATE_CODE: ByteArray = this.MAINNET_PRIVATE_CODE,
     private val TESTNET_PUBLIC_CODE: ByteArray = this.TESTNET_PUBLIC_CODE,

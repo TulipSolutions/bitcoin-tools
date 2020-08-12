@@ -15,6 +15,7 @@
 package nl.tulipsolutions.keyderivation
 
 interface ExtendedKeySerdeInterface {
+    fun getNetCodeAndType(isTest: Boolean, isPrivate: Boolean): ByteArray
     fun getAddress(extendedKey: ExtendedKey): String
     fun serializeExtKey(extendedKey: ExtendedKey): String
     fun toHexString(extendedKey: ExtendedKey): String

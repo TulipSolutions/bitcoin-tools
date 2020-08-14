@@ -1,0 +1,31 @@
+dist: trusty
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - wget
+      - pkg-config
+
+before_install:
+  - wget https://github.com/bazelbuild/bazelisk/releases/download/v1.6.0/bazelisk-linux-amd64
+  - echo "616f65bcdcfd134a19d5d86c591c35098d7732be26145bf06f02ec9e3e52700c bazelisk-linux-amd64" | sha256sum --check
+  - sudo dpkg -i bazelisk-linux-amd64
+
+
+jobs:
+  include:
+    - stage: "Formatting"
+      name: "Check Bazel build file formatting"
+      script: bazelisk run buildifier_check
+    - script: bazelisk run ktlint_check
+      name: "Kotlin file format checks"
+    - script: bazelisk run intellij_check
+      name: "Intellij formatter"
+    - script: bazelisk run addlicense_check
+      name: "Add license check"
+
+    - stage: "Tests"
+      name: "Unit Tests"
+      script: bazelisk test //src/test/...

@@ -5,7 +5,6 @@ deps = [
     "//src/main/kotlin/nl/tulipsolutions/byteutils",
     "@maven//:junit_junit",
     "@maven//:org_assertj_assertj_core",
-    "@maven//:org_bouncycastle_bcprov_jdk15on",
 ]
 
 kt_jvm_test(

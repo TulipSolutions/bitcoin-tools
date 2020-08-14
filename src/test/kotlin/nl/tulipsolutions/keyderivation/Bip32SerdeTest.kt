@@ -14,8 +14,8 @@
 
 package nl.tulipsolutions.keyderivation
 
+import nl.tulipsolutions.byteutils.Hex
 import org.assertj.core.api.Assertions
-import org.bouncycastle.util.encoders.Hex
 import org.junit.Test
 
 @kotlin.ExperimentalUnsignedTypes

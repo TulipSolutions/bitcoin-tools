@@ -105,7 +105,7 @@ class Bip32SerdeTest {
             depth = 0x00.toByte(),
             parentFingerprint = byteArrayOf(0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte()),
             childNumber = byteArrayOf(0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte()),
-            chainCode = Hex.decode("000000000000000000000000000000000000000000000000000000000000000000"),
+            chainCode = Hex.decode("0000000000000000000000000000000000000000000000000000000000000000"),
             // Note invalid and unused chaincode
             _publicKey = Hex.decode("0250863ad64a87ae8a2fe83c1af1a8403cb53f53e486d8511dad8a04887e5b2352"),
             privateKey = null

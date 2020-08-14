@@ -47,8 +47,17 @@ data class ExtendedKey(
         if (privateKey != null) calculateAndCheckPublicKeyFromPrivate(privateKey).getEncoded(true) else _publicKey!!
 
     init {
+        if (parentFingerprint.size != 4) {
+            throw RuntimeException("parentFingerprint should be 4 bytes long")
+        }
+        if (childNumber.size != 4) {
+            throw RuntimeException("childNumber should be 4 bytes long")
+        }
         if (privateKey != null && privateKey.size != 33) {
             throw RuntimeException("private key should be 33 bytes long")
+        }
+        if (chainCode.size != 32) {
+            throw RuntimeException("chainCode should be 32 bytes long")
         }
     }
 

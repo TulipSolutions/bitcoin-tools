@@ -18,13 +18,13 @@ import java.math.BigInteger
 import java.security.MessageDigest
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
+import nl.tulipsolutions.byteutils.Hex
 import nl.tulipsolutions.byteutils.getIntAt
 import nl.tulipsolutions.byteutils.toByteArray
 import org.bouncycastle.asn1.sec.SECNamedCurves
 import org.bouncycastle.crypto.digests.RIPEMD160Digest
 import org.bouncycastle.crypto.params.ECDomainParameters
 import org.bouncycastle.math.ec.ECPoint
-import org.bouncycastle.util.encoders.Hex
 
 const val HARDENED_KEY_ZERO = 0x80000000.toInt()
 

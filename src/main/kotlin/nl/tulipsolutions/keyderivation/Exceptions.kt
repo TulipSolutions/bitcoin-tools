@@ -15,8 +15,8 @@
 package nl.tulipsolutions.keyderivation
 
 import java.lang.RuntimeException
+import nl.tulipsolutions.byteutils.Hex
 import nl.tulipsolutions.byteutils.toByteArray
-import org.bouncycastle.util.encoders.Hex
 
 class InvalidDepthException(requiredDepth: Int, depth: Int) : RuntimeException() {
     override val message = "Depth should be $requiredDepth but was $depth"

@@ -99,6 +99,7 @@ gazelle(
 )
 
 addlicense_excludes = exclude_patterns + [
+    "./.travis.yml",
 ]
 
 addlicense(

@@ -1,5 +1,7 @@
 # Bitcoin library
 
+[![Build Status](https://travis-ci.org/TulipSolutions/bitcoin-tools.svg?branch=master)](https://travis-ci.org/TulipSolutions/bitcoin-tools)
+
 A kotlin library mainly focused on key derivation and implementation of required encodings (Base58 and Bech32).
 
 ## Background

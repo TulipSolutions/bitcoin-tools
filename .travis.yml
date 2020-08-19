@@ -11,7 +11,7 @@ addons:
 before_install:
   - wget https://github.com/bazelbuild/bazelisk/releases/download/v1.6.0/bazelisk-linux-amd64
   - echo "616f65bcdcfd134a19d5d86c591c35098d7732be26145bf06f02ec9e3e52700c bazelisk-linux-amd64" | sha256sum --check
-  - sudo dpkg -i bazelisk-linux-amd64
+  - mv bazelisk-linux-amd64 bazelisk
 
 
 jobs:

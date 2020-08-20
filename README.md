@@ -1,5 +1,7 @@
 # Bitcoin library
 
+![CI](https://github.com/TulipSolutions/bitcoin-tools/workflows/CI/badge.svg)
+
 A kotlin library mainly focused on key derivation and implementation of required encodings (Base58 and Bech32).
 
 ## Background

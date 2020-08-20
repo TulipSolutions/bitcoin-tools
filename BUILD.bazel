@@ -99,6 +99,7 @@ gazelle(
 )
 
 addlicense_excludes = exclude_patterns + [
+    "./.github/workflows/main.yml",
 ]
 
 addlicense(

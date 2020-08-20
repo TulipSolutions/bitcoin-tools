@@ -25,6 +25,7 @@ jobs:
         run: |
           wget https://github.com/bazelbuild/bazelisk/releases/download/v1.6.0/bazelisk-linux-amd64
           echo "616f65bcdcfd134a19d5d86c591c35098d7732be26145bf06f02ec9e3e52700c bazelisk-linux-amd64" | sha256sum --check
+          mkdir -p "${GITHUB_WORKSPACE}/bin/"
           sudo mv bazelisk-linux-amd64 ${GITHUB_WORKSPACE}/bin/bazelisk
           chmod +x /usr/bin/bazelisk
       - name: Build sources

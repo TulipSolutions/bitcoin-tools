@@ -9,10 +9,13 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 # Definition of our remote repository dependency
 #
 
-git_repository(
+BITCOIN_TOOLS_COMMIT = "8a6b2ccb237ce6f1f598b96197668c1fc19c4fca"
+
+http_archive(
     name = "nl_tulipsolutions_bitcoin_tools",
-    commit = "fbee0ac97f30c0b4ce72360f3b502ba97e149ca6",
-    remote = "git@github.com:TulipSolutions/bitcoin-tools.git",
+    sha256 = "ae39596f103b900a960ede831770cd3e60281486d1498865e5f70a3742bdf9f0",
+    strip_prefix = "bitcoin-tools-%s" % BITCOIN_TOOLS_COMMIT,
+    url = "https://github.com/TulipSolutions/bitcoin-tools/archive/%s.zip" % BITCOIN_TOOLS_COMMIT,
 )
 
 #

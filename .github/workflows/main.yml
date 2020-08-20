@@ -16,11 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Mount bazel cache
-        uses: actions/cache@v1
-        with:
-          path: "/home/runner/.cache/bazel"
-          key: bazel
       - name: Install Bazelisk
         run: |
           wget https://github.com/bazelbuild/bazelisk/releases/download/v1.6.0/bazelisk-linux-amd64
@@ -33,28 +28,42 @@ jobs:
           "${GITHUB_WORKSPACE}/bin/bazelisk" build //src/...
   # This workflow contains a single job called "build"
   formatting:
-      needs: build
-      runs-on: ubuntu-latest
-      steps:
-        - name: "Check Bazel build file formatting"
-          run: | 
-            "${GITHUB_WORKSPACE}/bin/bazelisk" run buildifier_check
-        - name: "Kotlin file format checks"
-          run: |   
-            "${GITHUB_WORKSPACE}/bin/bazelisk" run ktlint_check
-        - name: "Intellij formatter"
-          run: |
-            "${GITHUB_WORKSPACE}/bin/bazelisk" run intellij_check
-        - name: "Add license check"
-          run: | 
-            "${GITHUB_WORKSPACE}/bin/bazelisk" run addlicense_check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Bazelisk
+        run: |
+          wget https://github.com/bazelbuild/bazelisk/releases/download/v1.6.0/bazelisk-linux-amd64
+          echo "616f65bcdcfd134a19d5d86c591c35098d7732be26145bf06f02ec9e3e52700c bazelisk-linux-amd64" | sha256sum --check
+          mkdir -p "${GITHUB_WORKSPACE}/bin/"
+          sudo mv bazelisk-linux-amd64 ${GITHUB_WORKSPACE}/bin/bazelisk
+          chmod +x ${GITHUB_WORKSPACE}/bin/bazelisk
+      - name: "Check Bazel build file formatting"
+        run: | 
+          "${GITHUB_WORKSPACE}/bin/bazelisk" run buildifier_check
+      - name: "Kotlin file format checks"
+        run: |   
+          "${GITHUB_WORKSPACE}/bin/bazelisk" run ktlint_check
+      - name: "Intellij formatter"
+        run: |
+          "${GITHUB_WORKSPACE}/bin/bazelisk" run intellij_check
+      - name: "Add license check"
+        run: | 
+          "${GITHUB_WORKSPACE}/bin/bazelisk" run addlicense_check
   testing:
-    needs: build
-    runs-on: ubuntu-lates
+    runs-on: ubuntu-latest
     
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - uses: actions/checkout@v2
+      - name: Install Bazelisk
+        run: |
+          wget https://github.com/bazelbuild/bazelisk/releases/download/v1.6.0/bazelisk-linux-amd64
+          echo "616f65bcdcfd134a19d5d86c591c35098d7732be26145bf06f02ec9e3e52700c bazelisk-linux-amd64" | sha256sum --check
+          mkdir -p "${GITHUB_WORKSPACE}/bin/"
+          sudo mv bazelisk-linux-amd64 ${GITHUB_WORKSPACE}/bin/bazelisk
+          chmod +x ${GITHUB_WORKSPACE}/bin/bazelisk
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - name: "Unit Tests"
-      run: |
-        "${GITHUB_WORKSPACE}/bin/bazelisk" run test //src/test/...
+      - name: "Unit Tests"
+        run: |
+          "${GITHUB_WORKSPACE}/bin/bazelisk" run test //src/test/...

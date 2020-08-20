@@ -28,20 +28,25 @@ jobs:
           sudo mv bazelisk-linux-amd64 /usr/bin/bazelisk
           chmod +x /usr/bin/bazelisk
       - name: Build sources
-        run: bazelisk build //src/...
+        run: | 
+          "${GITHUB_WORKSPACE}/bin/bazel" build //src/...
   # This workflow contains a single job called "build"
   formatting:
       needs: build
       runs-on: ubuntu-latest
       steps:
         - name: "Check Bazel build file formatting"
-          run: bazelisk run buildifier_check
+          run: | 
+            "${GITHUB_WORKSPACE}/bin/bazelisk" run buildifier_check
         - name: "Kotlin file format checks"
-          run: bazelisk run ktlint_check
+          run: |   
+            "${GITHUB_WORKSPACE}/bin/bazelisk" run ktlint_check
         - name: "Intellij formatter"
-          run: bazelisk run intellij_check
+          run: |
+            "${GITHUB_WORKSPACE}/bin/bazelisk" run intellij_check
         - name: "Add license check"
-          run: bazelisk run addlicense_check
+          run: | 
+            "${GITHUB_WORKSPACE}/bin/bazelisk" run addlicense_check
   testing:
     needs: build
     runs-on: ubuntu-lates
@@ -50,4 +55,5 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - name: "Unit Tests"
-      run: bazelisk test //src/test/...
+      run: |
+        "${GITHUB_WORKSPACE}/bin/bazelisk" run test //src/test/...

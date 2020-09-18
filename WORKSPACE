@@ -5,10 +5,13 @@ workspace(
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
+TULIP_BAZEL_COMMIT = "8a4051f7283540e89b4707a20012bbd8d3804eec"
+
 http_archive(
     name = "nl_tulipsolutions_bazel_tools",
-    strip_prefix = "tulip-bazel-tools-master",
-    url = "https://github.com/TulipSolutions/tulip-bazel-tools/archive/master.zip",
+    sha256 = "93ba3c766ab8e56bf0279a5a43fb62774d6063fa74fa2d4b552d3ed6d2179ed3",
+    strip_prefix = "tulip-bazel-tools-%s" % TULIP_BAZEL_COMMIT,
+    url = "https://github.com/TulipSolutions/tulip-bazel-tools/archive/%s.zip" % TULIP_BAZEL_COMMIT,
 )
 
 RULES_JVM_EXTERNAL_TAG = "3.3"

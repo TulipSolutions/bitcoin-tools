@@ -43,8 +43,8 @@ fun main(args: Array<String>) {
     if (args.isEmpty() || args[0] == "help") {
         help()
     } else if (args[0] == "derive") {
-        val key = ExtendedKeyWrapper(args[0])
-        val leafChild = deriveChildren(args.drop(1), key)
+        val key = ExtendedKeyWrapper(args[1])
+        val leafChild = deriveChildren(args.drop(2), key)
         println("Address: ${leafChild.getAddress()}")
         println("ExtendedKey: ${leafChild.serializeExtKey()}")
     } else if (args[0] == "fromSeed") {

@@ -17,7 +17,7 @@ jobs:
       - name: Install Bazelisk
         run: |
           wget https://github.com/bazelbuild/bazelisk/releases/download/v1.6.1/bazelisk-linux-amd64
-          echo "76c3af8cfe19f287b532990296bb58f02074d388856256b45a5f51bdbd196657 bazelisk-linux-amd64" | sha256sum --check
+          echo "76c3af8cfe19f287b532990296bb58f02074d388856256b45a5f51bdbd196657 *bazelisk-linux-amd64" | sha256sum --check
           mkdir -p "${GITHUB_WORKSPACE}/bin/"
           sudo mv bazelisk-linux-amd64 ${GITHUB_WORKSPACE}/bin/bazelisk
           chmod +x ${GITHUB_WORKSPACE}/bin/bazelisk
@@ -32,7 +32,7 @@ jobs:
       - name: Install Bazelisk
         run: |
           wget https://github.com/bazelbuild/bazelisk/releases/download/v1.6.1/bazelisk-linux-amd64
-          echo "76c3af8cfe19f287b532990296bb58f02074d388856256b45a5f51bdbd196657 bazelisk-linux-amd64" | sha256sum --check
+          echo "76c3af8cfe19f287b532990296bb58f02074d388856256b45a5f51bdbd196657 *bazelisk-linux-amd64" | sha256sum --check
           mkdir -p "${GITHUB_WORKSPACE}/bin/"
           sudo mv bazelisk-linux-amd64 ${GITHUB_WORKSPACE}/bin/bazelisk
           chmod +x ${GITHUB_WORKSPACE}/bin/bazelisk
@@ -57,7 +57,7 @@ jobs:
       - name: Install Bazelisk
         run: |
           wget https://github.com/bazelbuild/bazelisk/releases/download/v1.6.1/bazelisk-linux-amd64
-          echo "76c3af8cfe19f287b532990296bb58f02074d388856256b45a5f51bdbd196657 bazelisk-linux-amd64" | sha256sum --check
+          echo "76c3af8cfe19f287b532990296bb58f02074d388856256b45a5f51bdbd196657 *bazelisk-linux-amd64" | sha256sum --check
           mkdir -p "${GITHUB_WORKSPACE}/bin/"
           sudo mv bazelisk-linux-amd64 ${GITHUB_WORKSPACE}/bin/bazelisk
           chmod +x ${GITHUB_WORKSPACE}/bin/bazelisk

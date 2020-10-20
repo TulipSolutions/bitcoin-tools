@@ -14,6 +14,7 @@
 
 package nl.tulipsolutions.keyderivation
 
+import nl.tulipsolutions.BCmath.ECMathProviderImpl
 import nl.tulipsolutions.byteutils.Hex
 import nl.tulipsolutions.byteutils.decodeBase58
 import nl.tulipsolutions.mnemonic.toSeed
@@ -50,45 +51,45 @@ class ExtendedKeyWrapperTest {
 
     @Test
     fun testBytesConstructor() {
-        val buildBip32FromBytes = ExtendedKeyWrapper(Hex.decode(testVec1xPubHex))
+        val buildBip32FromBytes = ExtendedKeyWrapper(ECMathProviderImpl, Hex.decode(testVec1xPubHex))
         Assertions.assertThat(buildBip32FromBytes.serializeExtKey()).isEqualTo(testVec1MxPubEncoded)
     }
 
     @Test
     fun testXpubStringConstructor() {
-        val buildBip32FromString = ExtendedKeyWrapper(testVec1MxPubEncoded)
+        val buildBip32FromString = ExtendedKeyWrapper(ECMathProviderImpl, testVec1MxPubEncoded)
         Assertions.assertThat(buildBip32FromString.serializeExtKey()).isEqualTo(testVec1MxPubEncoded)
 
-        val buildBip32Priv = ExtendedKeyWrapper(testVec1MxPrivEncoded)
+        val buildBip32Priv = ExtendedKeyWrapper(ECMathProviderImpl, testVec1MxPrivEncoded)
         Assertions.assertThat(buildBip32Priv.serializeExtKey()).isEqualTo(testVec1MxPrivEncoded)
     }
 
     @Test
     fun testZpubStringConstructor() {
-        val buildBip84FromString = ExtendedKeyWrapper(BIP84rootPub)
+        val buildBip84FromString = ExtendedKeyWrapper(ECMathProviderImpl, BIP84rootPub)
         Assertions.assertThat(buildBip84FromString.serializeExtKey()).isEqualTo(BIP84rootPub)
 
-        val buildBip84Priv = ExtendedKeyWrapper(BIP84rootPriv)
+        val buildBip84Priv = ExtendedKeyWrapper(ECMathProviderImpl, BIP84rootPriv)
         Assertions.assertThat(buildBip84Priv.serializeExtKey()).isEqualTo(BIP84rootPriv)
     }
 
     @Test
     fun testDeriveBip32Child() {
-        val buildBip32FromString = ExtendedKeyWrapper(testVec1MxPrivEncoded)
+        val buildBip32FromString = ExtendedKeyWrapper(ECMathProviderImpl, testVec1MxPrivEncoded)
         val derived = buildBip32FromString.deriveChild(HARDENED_KEY_ZERO)
         Assertions.assertThat(derived.serializeExtKey()).isEqualTo(testVec1M0HXPrivEncoded)
     }
 
     @Test
     fun testDeriveBip84Child() {
-        val buildBip84FromString = ExtendedKeyWrapper(m84slash0slash0xPriv)
+        val buildBip84FromString = ExtendedKeyWrapper(ECMathProviderImpl, m84slash0slash0xPriv)
         val derived = buildBip84FromString.deriveChild(0).deriveChild(0)
         Assertions.assertThat(derived.getPublicKey()).isEqualTo(Hex.decode(m84PubkeyFirst))
     }
 
     @Test
     fun getAddressBip84() {
-        val buildBip84FromString = ExtendedKeyWrapper(m84slash0slash0xPriv)
+        val buildBip84FromString = ExtendedKeyWrapper(ECMathProviderImpl, m84slash0slash0xPriv)
         val derived = buildBip84FromString.deriveChild(0).deriveChild(0)
         Assertions.assertThat(derived.getAddress()).isEqualTo(m84AddressFirst)
     }
@@ -98,8 +99,9 @@ class ExtendedKeyWrapperTest {
         mnemonicTestVectors.values.flatten().forEach { vector: MnemonicTestVectorEntry ->
             Assertions.assertThat(
                 ExtendedKeyWrapper(
+                    ECMathProviderImpl,
                     seed = vector.mnemonic.split(" ").toSeed(vector.passphrase),
-                    serde = Bip32Serde(),
+                    serde = Bip32Serde(ECMathProviderImpl),
                     isMainNet = true
                 ).serializeExtKey().decodeBase58()
 
@@ -111,8 +113,9 @@ class ExtendedKeyWrapperTest {
     fun testBip84MnemonicToZpriv() {
         Assertions.assertThat(
             ExtendedKeyWrapper(
+                ECMathProviderImpl,
                 seed = BIP84rootMnemonic.split(" ").toSeed(""),
-                serde = Bip84Serde(),
+                serde = Bip84Serde(ECMathProviderImpl),
                 isMainNet = true
             ).serializeExtKey()
         ).isEqualTo(BIP84rootPriv)

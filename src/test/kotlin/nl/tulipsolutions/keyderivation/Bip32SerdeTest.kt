@@ -14,12 +14,15 @@
 
 package nl.tulipsolutions.keyderivation
 
+import nl.tulipsolutions.BCmath.ECMathProviderImpl
 import nl.tulipsolutions.byteutils.Hex
 import org.assertj.core.api.Assertions
 import org.junit.Test
 
 @kotlin.ExperimentalUnsignedTypes
 class Bip32SerdeTest {
+
+    val ecMathProvider = ECMathProviderImpl
 
     // Test vectors from https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#test-vector-1
     private val testVec1MxPrivEncoded = "xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg" +
@@ -36,7 +39,8 @@ class Bip32SerdeTest {
         childNumber = byteArrayOf(0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte()),
         chainCode = Hex.decode("873DFF81C02F525623FD1FE5167EAC3A55A049DE3D314BB42EE227FFED37D508"),
         _publicKey = Hex.decode("0339A36013301597DAEF41FBE593A02CC513D0B55527EC2DF1050E2E8FF49C85C2"),
-        privateKey = null
+        privateKey = null,
+        ecMathProvider = ecMathProvider
     )
     private val testVec1M0HXPrivEncoded = "xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesn" +
         "DYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7"
@@ -68,7 +72,8 @@ class Bip32SerdeTest {
         "0488B21E05D880D7D83B9ACA00C783E67B921D2BEB8F6B389CC646D7263B4145701DADD2161548A8B078E65E9E022A471424DA5E6574" +
             "99D1FF51CB43C47481A03B1E77F951FE64CEC9F5A48F701118" +
             "D3A268"
-    private val serde = Bip32Serde()
+
+    private val serde = Bip32Serde(ecMathProvider)
 
     @Test
     fun testMasterSerializeKey() {
@@ -108,7 +113,8 @@ class Bip32SerdeTest {
             chainCode = Hex.decode("0000000000000000000000000000000000000000000000000000000000000000"),
             // Note invalid and unused chaincode
             _publicKey = Hex.decode("0250863ad64a87ae8a2fe83c1af1a8403cb53f53e486d8511dad8a04887e5b2352"),
-            privateKey = null
+            privateKey = null,
+            ecMathProvider = ecMathProvider
         )
         val master = serde.getAddress(testKey)
         Assertions.assertThat(
@@ -128,7 +134,8 @@ class Bip32SerdeTest {
             childNumber = byteArrayOf(0x80.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte()),
             chainCode = Hex.decode("47fdacbd0f1097043b78c63c20c34ef4ed9a111d980047ad16282c7ae6236141"),
             _publicKey = Hex.decode("035a784662a4a20a65bf6aab9ae98a6c068a81c52e4b032c0fb5400c706cfccc56"),
-            privateKey = null
+            privateKey = null,
+            ecMathProvider = ecMathProvider
         )
         Assertions.assertThatThrownBy { master.deriveChild(HARDENED_KEY_ZERO) }
             .hasMessage("Deriving a hardened key requires a private key")
@@ -146,7 +153,8 @@ class Bip32SerdeTest {
             childNumber = byteArrayOf(0x80.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte()),
             chainCode = Hex.decode("47fdacbd0f1097043b78c63c20c34ef4ed9a111d980047ad16282c7ae6236141"),
             _publicKey = Hex.decode("035a784662a4a20a65bf6aab9ae98a6c068a81c52e4b032c0fb5400c706cfccc56"),
-            privateKey = Hex.decode("00edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea")
+            privateKey = Hex.decode("00edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea"),
+            ecMathProvider = ecMathProvider
         )
         Assertions.assertThat(master.deriveChild(HARDENED_KEY_ZERO)).isEqualToComparingFieldByField(expected)
     }
@@ -163,7 +171,8 @@ class Bip32SerdeTest {
             childNumber = byteArrayOf(0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x01.toByte()),
             chainCode = Hex.decode("2a7857631386ba23dacac34180dd1983734e444fdbf774041578e9b6adb37c19"),
             _publicKey = Hex.decode("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c"),
-            privateKey = null
+            privateKey = null,
+            ecMathProvider = ecMathProvider
         )
         Assertions.assertThat(master.deriveChild(1)).isEqualToComparingFieldByField(expected)
     }
@@ -180,7 +189,8 @@ class Bip32SerdeTest {
             childNumber = byteArrayOf(0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x01.toByte()),
             chainCode = Hex.decode("2a7857631386ba23dacac34180dd1983734e444fdbf774041578e9b6adb37c19"),
             _publicKey = Hex.decode("03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c"),
-            privateKey = Hex.decode("003c6cb8d0f6a264c91ea8b5030fadaa8e538b020f0a387421a12de9319dc93368")
+            privateKey = Hex.decode("003c6cb8d0f6a264c91ea8b5030fadaa8e538b020f0a387421a12de9319dc93368"),
+            ecMathProvider = ecMathProvider
         )
         Assertions.assertThat(master.deriveChild(1)).isEqualToComparingFieldByField(expected)
     }
@@ -205,7 +215,8 @@ class Bip32SerdeTest {
             childNumber = byteArrayOf(0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x02.toByte()),
             chainCode = Hex.decode("cfb71883f01676f587d023cc53a35bc7f88f724b1f8c2892ac1275ac822a3edd"),
             _publicKey = Hex.decode("02e8445082a72f29b75ca48748a914df60622a609cacfce8ed0e35804560741d29"),
-            privateKey = null
+            privateKey = null,
+            ecMathProvider = ecMathProvider
         )
         Assertions.assertThat(master.deriveChild(2)).isEqualTo(expected)
     }
@@ -222,7 +233,8 @@ class Bip32SerdeTest {
             childNumber = Hex.decode("3b9aca00"),
             chainCode = Hex.decode("c783e67b921d2beb8f6b389cc646d7263b4145701dadd2161548a8b078e65e9e"),
             _publicKey = Hex.decode("022a471424da5e657499d1ff51cb43c47481a03b1e77f951fe64cec9f5a48f7011"),
-            privateKey = null
+            privateKey = null,
+            ecMathProvider = ecMathProvider
         )
         Assertions.assertThat(master.deriveChild(1000000000)).isEqualTo(expected)
     }
@@ -241,7 +253,8 @@ class Bip32SerdeTest {
         childNumber = byteArrayOf(0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte()),
         chainCode = Hex.decode("01D28A3E53CFFA419EC122C968B3259E16B65076495494D97CAE10BBFEC3C36F"),
         _publicKey = Hex.decode("03683AF1BA5743BDFC798CF814EFEEAB2735EC52D95ECED528E692B8E34C4E5669"),
-        privateKey = null
+        privateKey = null,
+        ecMathProvider = ecMathProvider
     )
     private val testVec3PrivateExtendedKey = ExtendedKey(
         parentKey = null,
@@ -251,7 +264,8 @@ class Bip32SerdeTest {
         childNumber = byteArrayOf(0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte()),
         chainCode = Hex.decode("01d28a3e53cffa419ec122c968b3259e16b65076495494d97cae10bbfec3c36f"),
         _publicKey = null,
-        privateKey = Hex.decode("0000ddb80b067e0d4993197fe10f2657a844a384589847602d56f0c629c81aae32")
+        privateKey = Hex.decode("0000ddb80b067e0d4993197fe10f2657a844a384589847602d56f0c629c81aae32"),
+        ecMathProvider = ecMathProvider
     )
 
     val testVec3Master0HxPubEncoded = "xpub68NZiKmJWnxxS6aaHmn81bvJeTESw724CRDs6HbuccFQN9Ku14VQrADWgqbhhTHBaohPX4CjNL" +

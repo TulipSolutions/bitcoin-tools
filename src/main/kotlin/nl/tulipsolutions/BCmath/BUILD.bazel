@@ -1,0 +1,11 @@
+load("@io_bazel_rules_kotlin//kotlin:kotlin.bzl", "kt_jvm_library")
+
+kt_jvm_library(
+    name = "BCmath",
+    srcs = glob(["*.kt"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//src/main/kotlin/nl/tulipsolutions/keyderivation",
+        "@maven//:org_bouncycastle_bcprov_jdk15on",
+    ],
+)

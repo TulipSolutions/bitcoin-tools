@@ -15,11 +15,25 @@
 package nl.tulipsolutions.keyderivation
 
 interface ExtendedKeySerdeInterface {
-    fun getNetCodeAndType(isMainNet: Boolean, isPrivate: Boolean): ByteArray
+
     fun getAddress(extendedKey: ExtendedKey): String
     fun serializeExtKey(extendedKey: ExtendedKey): String
     fun toHexString(extendedKey: ExtendedKey): String
     fun deSerializeExtKey(extKeyBytes: ByteArray): ExtendedKey
     fun deSerializeExtKey(extKeyEncoded: String): ExtendedKey
     fun deriveChildBIPRules(extendedKey: ExtendedKey, sequence: Int): ExtendedKey
+    fun hash160(extendedKey: ExtendedKey): ByteArray
+
+    fun getNetCodeAndType(isMainNet: Boolean, isPrivate: Boolean): ByteArray
+
+    val MAINNET_CODE: ByteArray
+    val TESTNET_CODE: ByteArray
+
+    val MAINNET_PUBLIC_CODE: ByteArray
+
+    val MAINNET_PRIVATE_CODE: ByteArray
+
+    val TESTNET_PUBLIC_CODE: ByteArray
+
+    val TESTNET_PRIVATE_CODE: ByteArray
 }

@@ -31,40 +31,40 @@ class ExtendedKeyWrapper {
         this.extendedKey = extendedKey
     }
 
-    constructor(extKeyString: String) {
+    constructor(ecMathProvider: ECMathProvider, extKeyString: String) {
         when (
             val netAndTypeCode = extKeyString.substring(0, 4)) {
             "xprv",
             "xpub",
             "tprv",
             "tpub" -> {
-                serde = Bip32Serde()
+                serde = Bip32Serde(ecMathProvider)
             }
             "zprv",
             "zpub",
             "vprv",
             "vpub" -> {
-                serde = Bip84Serde()
+                serde = Bip84Serde(ecMathProvider)
             }
             else -> throw RuntimeException("Extended Key type: $netAndTypeCode, not supported")
         }
         extendedKey = serde.deSerializeExtKey(extKeyString)
     }
 
-    constructor(extKeyBytes: ByteArray) {
+    constructor(ecMathProvider: ECMathProvider, extKeyBytes: ByteArray) {
         val netAndTypeCode = extKeyBytes.copyOfRange(0, 4)
         when {
             netAndTypeCode.contentEquals(Bip32Serde.MAINNET_PUBLIC_CODE) ||
                 netAndTypeCode.contentEquals(Bip32Serde.MAINNET_PRIVATE_CODE) ||
                 netAndTypeCode.contentEquals(Bip32Serde.TESTNET_PUBLIC_CODE) ||
                 netAndTypeCode.contentEquals(Bip32Serde.TESTNET_PRIVATE_CODE) -> {
-                serde = Bip32Serde()
+                serde = Bip32Serde(ecMathProvider)
             }
             netAndTypeCode.contentEquals(Bip84Serde.MAINNET_PUBLIC_CODE) ||
                 netAndTypeCode.contentEquals(Bip84Serde.MAINNET_PRIVATE_CODE) ||
                 netAndTypeCode.contentEquals(Bip84Serde.TESTNET_PUBLIC_CODE) ||
                 netAndTypeCode.contentEquals(Bip84Serde.TESTNET_PRIVATE_CODE) -> {
-                serde = Bip84Serde()
+                serde = Bip84Serde(ecMathProvider)
             }
             else -> throw RuntimeException("Type and net code: $netAndTypeCode, not supported")
         }
@@ -80,6 +80,7 @@ class ExtendedKeyWrapper {
      * @return [ExtendedKey]
      */
     constructor(
+        ecMathProvider: ECMathProvider,
         seed: ByteArray,
         serde: ExtendedKeySerdeInterface,
         isMainNet: Boolean = false
@@ -104,7 +105,8 @@ class ExtendedKeyWrapper {
             // Pad the private key part
             privateKey = byteArrayOf(0x00) + hmacSeed.sliceArray(0..31),
             _publicKey = null,
-            chainCode = hmacSeed.sliceArray(32..63)
+            chainCode = hmacSeed.sliceArray(32..63),
+            ecMathProvider = ecMathProvider
         )
     }
 

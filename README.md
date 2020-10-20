@@ -51,7 +51,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
     name = "nl_tulipsolutions_bitcoin_tools",
-    commit = "b25a2615d94d7d18c46ec27a16330f7891b8b893",
+    commit = "1a78849d243d2e2834eb2c80276863ed5746f6c8",
     remote = "https://github.com/TulipSolutions/bitcoin-tools",
 )
 ```
@@ -74,11 +74,16 @@ See also [example Build.bazel](examples/src/main/kotlin/com/example/simpleprojec
 3. The extended key wrapper can be used as follow:
 
 ```kotlin
+import nl.tulipsolutions.BCmath.ECMathProviderImpl
+// Choose your ECmath implementation
+// in this case we use bouncy castle
+val ecMathProvider = ECMathProviderImpl
+
 // m
 val zpriv = "zprvAdG4iTXWBoARxkkzNpNh8r6Qag3irQB8PzEMkAFeTRXxHpbF9z4QgEvBRmfvqWvGp42t42nvgGpNgYSJA9iefm1yYNZKEm7z6qUWCroSQnE"
 // The wrapper currently supports xpriv, xpub, tpub, tpriv which will enforce BIP32Serde
 // It also supports zpriv, zpub, vpriv, vpub which will enforce BIP84Serde
-val extendedKey = ExtendedKeyWrapper(zpriv)
+val extendedKey = ExtendedKeyWrapper(ecMathProvider, zpriv)
 println(extendedKey.getAddress())
 println(extendedKey.serializeExtKey())
 println(extendedKey.getPublicKey())
@@ -103,6 +108,7 @@ println(childOfChild.getPublicKey())
 val mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
 val passphrase = ""
 val extendedKeyFromMnemonic = ExtendedKeyWrapper(
+    ecMathProvider,
     seed = vector.mnemonic.split(" ").toSeed(passphrase),
     serde = Bip32Serde(),
     isMainNet = true
@@ -118,4 +124,5 @@ See also [example Main.kt](examples/src/main/kotlin/com/example/simpleproject/Ma
 - Signing: Same reason why we did not implement new private key generation
 - Implementation of derivation based on a keypath string
 - p2wpkh in P2SH
-- Move EC math to a separate class and use an interface to allow the developer to choose his preferred implementation.
+- Add libsecp256 c bindings and alternative ecmath implemenation provider
+

@@ -14,12 +14,15 @@
 
 package nl.tulipsolutions.keyderivation
 
+import nl.tulipsolutions.BCmath.ECMathProviderImpl
 import org.assertj.core.api.Assertions
 import org.bouncycastle.util.encoders.Hex
 import org.junit.Test
 
 @kotlin.ExperimentalUnsignedTypes
 class Bip84SerdeTest {
+
+    val ecMathProvider = ECMathProviderImpl
 
     private val rootPub = "zpub6jftahH18ngZxLmXaKw3GSZzZsszmt9WqedkyZdezFtWRFBZqsQH5hyUmb4pCEeZGmVfQuP5bedXTB8is6fTv" +
         "19U1GQRyQUKQGUTzyHACMF"
@@ -44,8 +47,7 @@ class Bip84SerdeTest {
     // Account 0, first change address = m/84'/0'/0'/1/0
     private val pubkeyFirstChange = "03025324888e429ab8e3dbaf1f7802648b9cd01e9b418485c5fa4c1b9b5700e1a6"
     private val addressFirstChange = "bc1q8c6fshw2dlwun7ekn9qwf37cu2rn755upcp6el"
-
-    private val serde = Bip84Serde()
+    private val serde = Bip84Serde(ecMathProvider)
 
     @Test
     fun testPubAndPrivSerializationRoot() {

@@ -18,28 +18,25 @@ package nl.tulipsolutions.keyderivation
     Bip84 uses the same underlying structure as bip32 it only encodes addresses differently ( bech32 instead of base58 ).
     The BIP is specifically aimed a derivation structures for segwit.
  */
-class Bip84Serde : Bip44Serde(
-    84,
-    this.MAINNET_PUBLIC_CODE, this.MAINNET_PRIVATE_CODE,
-    this.TESTNET_PUBLIC_CODE, this.TESTNET_PRIVATE_CODE
-) {
+open class Bip84Serde(
+    ecMathProvider: ECMathProvider
+) : Bip44Serde(ecMathProvider, 84) {
 
     companion object {
-        private val MAINNET_CODE = byteArrayOf(0x04.toByte(), 0xb2.toByte())
-        private val TESTNET_CODE = byteArrayOf(0x04.toByte(), 0x5f.toByte())
-
-        @JvmStatic
+        val MAINNET_CODE = byteArrayOf(0x04.toByte(), 0xb2.toByte())
+        val TESTNET_CODE = byteArrayOf(0x04.toByte(), 0x5f.toByte())
         val MAINNET_PUBLIC_CODE = MAINNET_CODE + byteArrayOf(0x47.toByte(), 0x46.toByte())
-
-        @JvmStatic
         val MAINNET_PRIVATE_CODE = MAINNET_CODE + byteArrayOf(0x43.toByte(), 0x0C.toByte())
-
-        @JvmStatic
         val TESTNET_PUBLIC_CODE = TESTNET_CODE + byteArrayOf(0x1C.toByte(), 0xF6.toByte())
-
-        @JvmStatic
         val TESTNET_PRIVATE_CODE = TESTNET_CODE + byteArrayOf(0x18.toByte(), 0xbc.toByte())
     }
+
+    override val MAINNET_CODE = Companion.MAINNET_CODE
+    override val TESTNET_CODE = Companion.TESTNET_CODE
+    override val MAINNET_PUBLIC_CODE = Companion.MAINNET_PUBLIC_CODE
+    override val MAINNET_PRIVATE_CODE = Companion.MAINNET_PRIVATE_CODE
+    override val TESTNET_PUBLIC_CODE = Companion.TESTNET_PUBLIC_CODE
+    override val TESTNET_PRIVATE_CODE = Companion.TESTNET_PRIVATE_CODE
 
     override fun getNetCodeAndType(isMainNet: Boolean, isPrivate: Boolean): ByteArray =
         if (isMainNet) {
@@ -56,7 +53,7 @@ class Bip84Serde : Bip44Serde(
         if (extendedKey.depth.toInt() != 5) {
             throw InvalidDepthException(5, extendedKey.depth.toInt())
         }
-        val program = this.hash160(extendedKey).toList().map { it.toInt() and 0xff }
+        val program = super.hash160(extendedKey).toList().map { it.toInt() and 0xff }
         val version = 0.toByte()
         val netCodeAndType = extendedKey.netAndTypeCode
         return when {

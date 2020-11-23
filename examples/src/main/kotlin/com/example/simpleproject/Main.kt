@@ -15,6 +15,7 @@
 package com.example.simpleproject
 
 import java.lang.RuntimeException
+import nl.tulipsolutions.BCmath.ECMathProviderImpl
 import nl.tulipsolutions.keyderivation.Bip32Serde
 import nl.tulipsolutions.keyderivation.Bip44Serde
 import nl.tulipsolutions.keyderivation.Bip84Serde
@@ -38,20 +39,21 @@ fun help() {
     println("Example: fromSeed bip32 main TREZOR \"abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about\"")
 }
 
+val ecMathProvider = ECMathProviderImpl
 fun main(args: Array<String>) {
 
     if (args.isEmpty() || args[0] == "help") {
         help()
     } else if (args[0] == "derive") {
-        val key = ExtendedKeyWrapper(args[1])
-        val leafChild = deriveChildren(args.drop(2), key)
+        val key = ExtendedKeyWrapper(ecMathProvider, args[0])
+        val leafChild = deriveChildren(args.drop(1), key)
         println("Address: ${leafChild.getAddress()}")
         println("ExtendedKey: ${leafChild.serializeExtKey()}")
     } else if (args[0] == "fromSeed") {
         val serde: Pair<ExtendedKeySerdeInterface, Int> = when (args[1]) {
-            "bip32" -> Pair(Bip32Serde(), 0)
-            "bip44" -> Pair(Bip44Serde(), Bip44Serde().purpose)
-            "bip84" -> Pair(Bip84Serde(), Bip84Serde().purpose)
+            "bip32" -> Pair(Bip32Serde(ecMathProvider), 0)
+            "bip44" -> Pair(Bip44Serde(ecMathProvider), Bip44Serde(ecMathProvider).purpose)
+            "bip84" -> Pair(Bip84Serde(ecMathProvider), Bip84Serde(ecMathProvider).purpose)
             else -> throw RuntimeException("Invalid arg expected one of ${availableSerdes.joinToString(" | ")} was $args[1]")
         }
         val isMain = when (args[2]) {
@@ -60,7 +62,7 @@ fun main(args: Array<String>) {
             else -> throw RuntimeException("Invalid arg expected one of ${network.joinToString(" | ")} was $args[1]")
         }
         var path = "m/"
-        val rootKey = ExtendedKeyWrapper(args[4].split(" ").toSeed(args[3]), serde.first, isMain)
+        val rootKey = ExtendedKeyWrapper(ecMathProvider, args[4].split(" ").toSeed(args[3]), serde.first, isMain)
         println("Path: $path")
         println("Master ExtendedKey: ${rootKey.serializeExtKey()}")
 

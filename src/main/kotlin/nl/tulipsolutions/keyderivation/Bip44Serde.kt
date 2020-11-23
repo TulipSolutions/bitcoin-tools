@@ -18,23 +18,17 @@ import nl.tulipsolutions.byteutils.ZERO_BYTE
 
 // See: https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
 open class Bip44Serde(
-    val purpose: Int = 44,
-    private val MAINNET_PUBLIC_CODE: ByteArray = this.MAINNET_PUBLIC_CODE,
-    private val MAINNET_PRIVATE_CODE: ByteArray = this.MAINNET_PRIVATE_CODE,
-    private val TESTNET_PUBLIC_CODE: ByteArray = this.TESTNET_PUBLIC_CODE,
-    private val TESTNET_PRIVATE_CODE: ByteArray = this.TESTNET_PRIVATE_CODE
-) : Bip32Serde(
-    MAINNET_PUBLIC_CODE, MAINNET_PRIVATE_CODE,
-    TESTNET_PUBLIC_CODE, TESTNET_PRIVATE_CODE
-) {
+    ecMathProvider: ECMathProvider,
+    val purpose: Int = 44
+) : Bip32Serde(ecMathProvider) {
 
-    private val PURPOSE_VALUE = HARDENED_KEY_ZERO + purpose
+    private fun purposeValue() = HARDENED_KEY_ZERO + purpose
 
     // BIP44 only introduces a derivation path spec m / purpose' / coin_type' / account' / change / address_index
     override fun deriveChildBIPRules(extendedKey: ExtendedKey, sequence: Int): ExtendedKey {
         if (extendedKey.depth.toInt() in 0..2 && sequence.and(HARDENED_KEY_ZERO) == 0) {
             throw HardenedDerivationRequiredException(extendedKey.depth.toInt(), sequence)
-        } else if (extendedKey.depth == ZERO_BYTE && sequence != PURPOSE_VALUE) {
+        } else if (extendedKey.depth == ZERO_BYTE && sequence != purposeValue()) {
             throw InvalidPurposeException(purpose, sequence)
         }
         return extendedKey.deriveChild(sequence)

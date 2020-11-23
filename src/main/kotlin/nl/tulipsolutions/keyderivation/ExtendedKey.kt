@@ -21,10 +21,7 @@ import javax.crypto.spec.SecretKeySpec
 import nl.tulipsolutions.byteutils.Hex
 import nl.tulipsolutions.byteutils.getIntAt
 import nl.tulipsolutions.byteutils.toByteArray
-import org.bouncycastle.asn1.sec.SECNamedCurves
 import org.bouncycastle.crypto.digests.RIPEMD160Digest
-import org.bouncycastle.crypto.params.ECDomainParameters
-import org.bouncycastle.math.ec.ECPoint
 
 const val HARDENED_KEY_ZERO = 0x80000000.toInt()
 
@@ -37,11 +34,9 @@ data class ExtendedKey(
     val chainCode: ByteArray,
     // This allows us to derive the public key from the private key if it is provided
     val _publicKey: ByteArray?,
-    val privateKey: ByteArray?
+    val privateKey: ByteArray?,
+    val ecMathProvider: ECMathProvider
 ) {
-
-    private val curveParams = SECNamedCurves.getByName("secp256k1")
-    private val domain = ECDomainParameters(curveParams.curve, curveParams.g, curveParams.n, curveParams.h)
 
     val publicKey: ByteArray =
         if (privateKey != null) calculateAndCheckPublicKeyFromPrivate(privateKey).getEncoded(true) else _publicKey!!
@@ -83,14 +78,15 @@ data class ExtendedKey(
         return retValue.slice(0..3).toByteArray()
     }
 
-    private fun calculateAndCheckPublicKeyFromPrivate(privateBytes: ByteArray): ECPoint {
+    private fun calculateAndCheckPublicKeyFromPrivate(privateBytes: ByteArray): ECPointWrapper {
         val kpar = privateBytes.copyOfRange(1, privateBytes.size)
-        val parentPub = this.curveParams.g.multiply(
-            BigInteger(1, kpar).mod(this.curveParams.n)
+
+        val parentPub = ecMathProvider.multiplyByG(
+            BigInteger(1, kpar).mod(ecMathProvider.curveN)
         )
         return try {
             // Bouncy castle does all the checks for us.
-            this.domain.validatePublicPoint(parentPub)
+            ecMathProvider.validatePublicPoint(parentPub)
         } catch (e: RuntimeException) {
             throw RuntimeException(
                 "the resulting key is invalid, and one should proceed with the next value for sequence"
@@ -121,8 +117,8 @@ data class ExtendedKey(
     // Private parent key → private child key
     private fun derivePrivateChild(sequence: Int): ExtendedKey {
         val kpar = this.privateKey!!.copyOfRange(1, this.privateKey.size)
-        val parentPub = this.curveParams.g.multiply(
-            BigInteger(1, kpar).mod(this.curveParams.n)
+        val parentPub = ecMathProvider.multiplyByG(
+            BigInteger(1, kpar).mod(ecMathProvider.curveN)
         )
         val mac = Mac.getInstance("HmacSHA512")
         mac.reset()
@@ -148,21 +144,21 @@ data class ExtendedKey(
         val IR = I.copyOfRange(32, 64)
         // parse256(IL)
         val parse256IL = BigInteger(1, IL)
-        if (parse256IL >= this.curveParams.n) {
+        if (parse256IL >= ecMathProvider.curveN) {
             throw RuntimeException("generated left bits for child are larger than curveN")
         }
         // parse256(IL) + kpar (mod n)
-        val ki = parse256IL.add(BigInteger(1, kpar)).mod(this.curveParams.n)
+        val ki = parse256IL.add(BigInteger(1, kpar)).mod(ecMathProvider.curveN)
         // The returned chain code ci is IR.
         val ci = IR
         // In case parse256(IL) ≥ n or ki = 0
-        if (parse256IL >= this.domain.n || ki == BigInteger.ZERO) {
+        if (parse256IL >= ecMathProvider.curveN || ki == BigInteger.ZERO) {
             throw RuntimeException(
                 "the resulting key is invalid, and one should proceed with the next value for sequence"
             )
         }
         // Also add the pubkey
-        val pub = this.curveParams.g.multiply(ki).getEncoded(true)
+        val pub = ecMathProvider.multiplyByG(ki).getEncoded(true)
         val keyBytes =
             (if (ki.toByteArray().size == 32) byteArrayOf(0x00) else byteArrayOf()) + ki.toByteArray()
         return this.copy(
@@ -182,7 +178,7 @@ data class ExtendedKey(
         // Calculate I = HMAC-SHA512(Key = cpar, Data = serP(Kpar) || ser32(i)).
         val key = SecretKeySpec(this.chainCode, "HmacSHA512")
         mac.init(key)
-        val Kpar = this.curveParams.curve.decodePoint(this.publicKey)
+        val Kpar = ecMathProvider.decodePoint(this.publicKey)
         // serP(Kpar) || ser32(i))
         val data = Kpar.getEncoded(true) + sequence.toByteArray()
         val I = mac.doFinal(
@@ -193,13 +189,13 @@ data class ExtendedKey(
         val IR = I.copyOfRange(32, 64)
         // parse256(IL)
         val parse256IL = BigInteger(1, IL)
-        if (parse256IL >= this.curveParams.n) {
+        if (parse256IL >= ecMathProvider.curveN) {
             throw RuntimeException("generated left bits for child are large than curveN")
         }
         // point(parse256(IL))
-        val intermediate = parse256IL.mod(this.curveParams.n)
+        val intermediate = parse256IL.mod(ecMathProvider.curveN)
         // point()
-        val point = this.curveParams.g.multiply(intermediate)
+        val point = ecMathProvider.multiplyByG(intermediate)
         // point(parse256(IL)) + Kpar
         val ki = point.add(Kpar)
         // The returned chain code ci is IR.
@@ -208,7 +204,7 @@ data class ExtendedKey(
         // and one should proceed with the next value for i.
         val kiChecked = try {
             // Bouncy castle does all the checks for us.
-            this.domain.validatePublicPoint(ki)
+            ecMathProvider.validatePublicPoint(ki)
         } catch (e: RuntimeException) {
             throw RuntimeException(
                 "the resulting key is invalid, and one should proceed with the next value for sequence"

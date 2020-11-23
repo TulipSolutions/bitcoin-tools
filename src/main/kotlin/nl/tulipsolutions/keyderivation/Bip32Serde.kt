@@ -20,30 +20,28 @@ import nl.tulipsolutions.byteutils.encodeBase58
 import org.bouncycastle.crypto.digests.RIPEMD160Digest
 
 open class Bip32Serde(
-    private val MAINNET_PUBLIC_CODE: ByteArray = this.MAINNET_PUBLIC_CODE,
-    private val MAINNET_PRIVATE_CODE: ByteArray = this.MAINNET_PRIVATE_CODE,
-    private val TESTNET_PUBLIC_CODE: ByteArray = this.TESTNET_PUBLIC_CODE,
-    private val TESTNET_PRIVATE_CODE: ByteArray = this.TESTNET_PRIVATE_CODE,
-    private val MAINNET_ADDRESS_CODE: ByteArray = byteArrayOf(0x00),
-    private val TESTNET_ADDRESS_CODE: ByteArray = byteArrayOf(0x6F)
+    private val ecMathProvider: ECMathProvider
 ) : ExtendedKeySerdeInterface {
 
     companion object {
-        private val MAINNET_CODE = byteArrayOf(0x04.toByte(), 0x88.toByte())
-        private val TESTNET_CODE = byteArrayOf(0x04.toByte(), 0x35.toByte())
-
-        @JvmStatic
+        val MAINNET_CODE = byteArrayOf(0x04.toByte(), 0x88.toByte())
+        val TESTNET_CODE = byteArrayOf(0x04.toByte(), 0x35.toByte())
         val MAINNET_PUBLIC_CODE = MAINNET_CODE + byteArrayOf(0xB2.toByte(), 0x1E.toByte())
-
-        @JvmStatic
         val MAINNET_PRIVATE_CODE = MAINNET_CODE + byteArrayOf(0xAD.toByte(), 0xE4.toByte())
-
-        @JvmStatic
         val TESTNET_PUBLIC_CODE = TESTNET_CODE + byteArrayOf(0x87.toByte(), 0xCF.toByte())
-
-        @JvmStatic
         val TESTNET_PRIVATE_CODE = TESTNET_CODE + byteArrayOf(0x83.toByte(), 0x94.toByte())
+        private val MAINNET_ADDRESS_CODE: ByteArray = byteArrayOf(0x00)
+        private val TESTNET_ADDRESS_CODE: ByteArray = byteArrayOf(0x6F)
     }
+
+    override val MAINNET_CODE = Companion.MAINNET_CODE
+    override val TESTNET_CODE = Companion.TESTNET_CODE
+    override val MAINNET_PUBLIC_CODE = Companion.MAINNET_PUBLIC_CODE
+    override val MAINNET_PRIVATE_CODE = Companion.MAINNET_PRIVATE_CODE
+    override val TESTNET_PUBLIC_CODE = Companion.TESTNET_PUBLIC_CODE
+    override val TESTNET_PRIVATE_CODE = Companion.TESTNET_PRIVATE_CODE
+    private val MAINNET_ADDRESS_CODE: ByteArray = Companion.MAINNET_ADDRESS_CODE
+    private val TESTNET_ADDRESS_CODE: ByteArray = Companion.TESTNET_ADDRESS_CODE
 
     override fun getNetCodeAndType(isMainNet: Boolean, isPrivate: Boolean): ByteArray =
         if (isMainNet) {
@@ -61,9 +59,7 @@ open class Bip32Serde(
 
     override fun toHexString(extendedKey: ExtendedKey) = extendedKey.toString()
 
-    override fun deSerializeExtKey(extKeyEncoded: String): ExtendedKey {
-        return deSerializeExtKey(extKeyEncoded.decodeBase58())
-    }
+    override fun deSerializeExtKey(extKeyEncoded: String) = deSerializeExtKey(extKeyEncoded.decodeBase58())
 
     private fun calculateExtendedCheckSum(extendedKey: ByteArray): ByteArray {
         val digest = MessageDigest.getInstance("SHA-256")
@@ -73,7 +69,7 @@ open class Bip32Serde(
         return digest.digest(hashedExtendKey).copyOfRange(0, 4)
     }
 
-    fun hash160(extendedKey: ExtendedKey): ByteArray {
+    override fun hash160(extendedKey: ExtendedKey): ByteArray {
         val sha256Digest = MessageDigest.getInstance("SHA-256")
             .digest(extendedKey.publicKey)
         val digest = RIPEMD160Digest()
@@ -97,9 +93,7 @@ open class Bip32Serde(
         return extendedKeyBytes.plus(calculateExtendedCheckSum(extendedKeyBytes)).encodeBase58()
     }
 
-    override fun serializeExtKey(extendedKey: ExtendedKey): String {
-        return extendedKey.toExtendedKeyBytes().encodeBase58()
-    }
+    override fun serializeExtKey(extendedKey: ExtendedKey) = extendedKey.toExtendedKeyBytes().encodeBase58()
 
     override fun deSerializeExtKey(extKeyBytes: ByteArray): ExtendedKey {
         var offset = IntRange(0, 4)
@@ -132,7 +126,8 @@ open class Bip32Serde(
             childNumber,
             chainCode,
             if (!isPrivate) key else null,
-            if (isPrivate) key else null
+            if (isPrivate) key else null,
+            ecMathProvider
         )
     }
 }
